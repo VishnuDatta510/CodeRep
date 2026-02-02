@@ -1,0 +1,25 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Problem {
+  id             String   @id @default(uuid())
+  userId         String
+  
+  title          String
+  url            String
+  difficulty     String
+  
+  step           Int      @default(0)
+  interval       Int      @default(1)
+  nextReviewDate DateTime @default(now())
+  isTracking     Boolean  @default(true)
+  
+  notes          String?
+  createdAt      DateTime @default(now())
+}
