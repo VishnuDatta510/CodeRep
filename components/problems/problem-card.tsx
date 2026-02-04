@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
+import { ExternalLink } from "lucide-react";
 
 interface ProblemProps {
   problem: {
@@ -33,6 +34,7 @@ export function ProblemCard({ problem }: ProblemProps) {
   const [notesOpen, setNotesOpen] = useState(false);
   const [notesText, setNotesText] = useState(problem.notes || "");
   const [notesSaving, setNotesSaving] = useState(false);
+  const [countdown, setCountdown] = useState("");
 
   const handleReview = async (rating: string) => {
     setLoading(true);
@@ -132,17 +134,69 @@ export function ProblemCard({ problem }: ProblemProps) {
     }
   };
 
+  // Calculate if problem is due today or overdue
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const reviewDate = new Date(problem.nextReviewDate);
+  reviewDate.setHours(0, 0, 0, 0);
+  const isDueToday = today.getTime() === reviewDate.getTime();
+  const isOverdue = reviewDate.getTime() < today.getTime();
+
+  // Update countdown every minute
+  useEffect(() => {
+    // Calculate countdown with live timer
+    const calculateCountdown = () => {
+      const now = new Date();
+      const reviewDateFull = new Date(problem.nextReviewDate);
+      const diffMs = reviewDateFull.getTime() - now.getTime();
+
+      const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const hours = Math.floor(
+        (diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+      );
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+      if (days < 0) return "Overdue";
+      if (days === 0) {
+        if (hours > 0) return `Today (${hours}h ${minutes}m left)`;
+        if (minutes > 0) return `Today (${minutes}m left)`;
+        return "Due now";
+      }
+      if (days === 1) return `Tomorrow (${days}d ${hours}h left)`;
+      return `${days} days (${days}d ${hours}h left)`;
+    };
+
+    setCountdown(calculateCountdown());
+    const interval = setInterval(() => {
+      setCountdown(calculateCountdown());
+    }, 60000); // Update every minute
+
+    return () => clearInterval(interval);
+  }, [problem.nextReviewDate]);
+
   return (
-    <div className="p-4 border rounded-lg flex justify-between items-center bg-card shadow-sm transition-all hover:shadow-md">
+    <div
+      className={`p-4 border rounded-lg flex justify-between items-center transition-all hover:shadow-md ${
+        isOverdue
+          ? "bg-red-50 border-red-300 shadow-sm"
+          : isDueToday
+            ? "bg-blue-50 border-blue-200 shadow-sm"
+            : "bg-card border-gray-200 shadow-sm"
+      }`}
+    >
       <div>
-        <a
-          href={problem.url}
-          target="_blank"
-          className="text-lg font-semibold hover:underline text-blue-600"
-        >
-          {problem.title}
-        </a>
-        <div className="flex gap-2 text-sm text-gray-500 mt-1">
+        <div className="flex items-center gap-2">
+          <a
+            href={problem.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1.5 group"
+          >
+            {problem.title}
+            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+          </a>
+        </div>
+        <div className="flex gap-2 text-sm text-gray-600 mt-1">
           <span
             className={`px-2 py-0.5 rounded text-xs font-medium ${
               problem.difficulty === "Easy"
@@ -159,14 +213,24 @@ export function ProblemCard({ problem }: ProblemProps) {
               MASTERED
             </span>
           )}
-          <span>• Interval: {problem.interval} days</span>
+          {isOverdue && (
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 border border-red-200 animate-pulse">
+              Overdue
+            </span>
+          )}
+          {isDueToday && (
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200 animate-pulse">
+              Due Today
+            </span>
+          )}
+          <span>• {countdown}</span>
           {problem.interval >= 60 && (
             <button
               onClick={handleResetProgress}
               disabled={loading}
               className="ml-2 px-2 py-0.5 rounded text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 transition-colors disabled:opacity-50"
             >
-              🔄 Reset Progress
+              Reset Progress
             </button>
           )}
         </div>
@@ -233,7 +297,7 @@ export function ProblemCard({ problem }: ProblemProps) {
                     Notes
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="sm:max-w-[800px] max-h-[90vh]">
+                <DialogContent className="sm:max-w-200 max-h-[90vh]">
                   <DialogHeader>
                     <DialogTitle>Problem Notes</DialogTitle>
                   </DialogHeader>
@@ -243,7 +307,7 @@ export function ProblemCard({ problem }: ProblemProps) {
                       value={notesText}
                       onChange={(e) => setNotesText(e.target.value)}
                       rows={12}
-                      className="resize-none min-h-[400px]"
+                      className="resize-none min-h-100"
                     />
                     <div className="flex gap-2 justify-end">
                       {problem.notes && (

@@ -179,7 +179,7 @@ export function AddProblemDialog() {
             />
             {fetching && (
               <p className="text-sm text-blue-600 font-medium">
-                🔍 Fetching problem details...
+                Fetching problem details...
               </p>
             )}
             {fetchError && (
