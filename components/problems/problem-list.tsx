@@ -4,6 +4,9 @@ import { useState } from "react";
 import { ProblemCard } from "./problem-card";
 import { ProblemSortSelect, SortOption } from "./problem-sort-select";
 import { AddProblemDialog } from "./add-problem-dialog";
+import { Button } from "@/components/ui/button";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 
 interface Problem {
   id: string;
@@ -78,9 +81,14 @@ export function ProblemList({
             {trackedCount} tracked • {untrackedCount} archived
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <ProblemSortSelect value={sortBy} onValueChange={setSortBy} />
           <AddProblemDialog />
+          <Link href="/dashboard/settings">
+            <Button variant="outline" size="icon" className="shrink-0">
+              <Settings className="h-4 w-4" />
+            </Button>
+          </Link>
         </div>
       </div>
 

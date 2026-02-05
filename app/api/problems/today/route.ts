@@ -4,11 +4,9 @@ import { db } from "@/lib/db";
 
 // Helper to get userId from Clerk session or API token
 async function getUserId(req: Request): Promise<string | null> {
-  // Try Clerk auth first
   const { userId } = await auth();
   if (userId) return userId;
 
-  // Try API token
   const authHeader = req.headers.get("Authorization");
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
@@ -24,7 +22,7 @@ async function getUserId(req: Request): Promise<string | null> {
   return null;
 }
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   try {
     const userId = await getUserId(req);
 
@@ -32,36 +30,39 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { title, url, difficulty, notes } = body;
+    // Get today's date at start of day
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-    // Check if problem already exists for this user
-    const existingProblem = await db.problem.findFirst({
+    // Get tomorrow at start of day
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    // Find problems due today or overdue
+    const problems = await db.problem.findMany({
       where: {
         userId,
-        url: {
-          contains: url.split("?")[0], // Match without query params
+        isTracking: true,
+        nextReviewDate: {
+          lt: tomorrow, // Due before tomorrow = due today or overdue
         },
       },
-    });
-
-    if (existingProblem) {
-      return NextResponse.json(existingProblem);
-    }
-
-    const newProblem = await db.problem.create({
-      data: {
-        userId,
-        title,
-        url: url.split("?")[0], // Store clean URL
-        difficulty,
-        notes,
+      orderBy: {
+        nextReviewDate: "asc",
+      },
+      select: {
+        id: true,
+        title: true,
+        url: true,
+        difficulty: true,
+        interval: true,
+        nextReviewDate: true,
       },
     });
 
-    return NextResponse.json(newProblem);
+    return NextResponse.json(problems);
   } catch (error) {
-    console.error("Error creating problem:", error);
+    console.error("Error fetching today's problems:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

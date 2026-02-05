@@ -2,12 +2,32 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
+// Helper to get userId from Clerk session or API token
+async function getUserId(req: Request): Promise<string | null> {
+  const { userId } = await auth();
+  if (userId) return userId;
+
+  const authHeader = req.headers.get("Authorization");
+  if (authHeader?.startsWith("Bearer ")) {
+    const token = authHeader.substring(7);
+    const apiToken = await db.apiToken.findUnique({
+      where: { token },
+    });
+
+    if (apiToken && apiToken.expiresAt > new Date()) {
+      return apiToken.userId;
+    }
+  }
+
+  return null;
+}
+
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   try {
-    const { userId } = await auth();
+    const userId = await getUserId(req);
     if (!userId)
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

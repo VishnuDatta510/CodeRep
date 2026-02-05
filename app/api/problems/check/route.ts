@@ -4,11 +4,9 @@ import { db } from "@/lib/db";
 
 // Helper to get userId from Clerk session or API token
 async function getUserId(req: Request): Promise<string | null> {
-  // Try Clerk auth first
   const { userId } = await auth();
   if (userId) return userId;
 
-  // Try API token
   const authHeader = req.headers.get("Authorization");
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
@@ -24,7 +22,7 @@ async function getUserId(req: Request): Promise<string | null> {
   return null;
 }
 
-export async function POST(req: Request) {
+export async function GET(req: Request) {
   try {
     const userId = await getUserId(req);
 
@@ -32,36 +30,31 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { title, url, difficulty, notes } = body;
+    const { searchParams } = new URL(req.url);
+    const url = searchParams.get("url");
 
-    // Check if problem already exists for this user
-    const existingProblem = await db.problem.findFirst({
+    if (!url) {
+      return NextResponse.json(
+        { error: "URL parameter required" },
+        { status: 400 },
+      );
+    }
+
+    // Clean URL - remove query params and trailing slash
+    const cleanUrl = url.split("?")[0].replace(/\/$/, "");
+
+    const problem = await db.problem.findFirst({
       where: {
         userId,
         url: {
-          contains: url.split("?")[0], // Match without query params
+          contains: cleanUrl.split("/problems/")[1]?.split("/")[0] || cleanUrl,
         },
       },
     });
 
-    if (existingProblem) {
-      return NextResponse.json(existingProblem);
-    }
-
-    const newProblem = await db.problem.create({
-      data: {
-        userId,
-        title,
-        url: url.split("?")[0], // Store clean URL
-        difficulty,
-        notes,
-      },
-    });
-
-    return NextResponse.json(newProblem);
+    return NextResponse.json({ exists: !!problem });
   } catch (error) {
-    console.error("Error creating problem:", error);
+    console.error("Error checking problem:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },
