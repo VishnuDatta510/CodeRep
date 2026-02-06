@@ -1,14 +1,16 @@
-import {
-  ClerkProvider,
-  SignInButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
+import type { Metadata } from "next";
+
 const inter = Inter({ subsets: ["latin"] });
+
+export const metadata: Metadata = {
+  title: "CodeRep - Spaced Repetition for LeetCode",
+  description:
+    "Never forget a LeetCode problem again. CodeRep uses spaced repetition to schedule your reviews at the perfect time.",
+};
 
 export default function RootLayout({
   children,
@@ -18,22 +20,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={inter.className}>
-          <header className="flex justify-between items-center p-4 border-b">
-            <h1 className="font-bold text-xl">CodeRep</h1>
-            <div>
-              <SignedOut>
-                <SignInButton />
-              </SignedOut>
-
-              <SignedIn>
-                <UserButton />
-              </SignedIn>
-            </div>
-          </header>
-
-          {children}
-        </body>
+        <body className={inter.className}>{children}</body>
       </html>
     </ClerkProvider>
   );
