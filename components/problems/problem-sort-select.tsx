@@ -25,7 +25,7 @@ export function ProblemSortSelect({
 }: ProblemSortSelectProps) {
   return (
     <Select value={value} onValueChange={onValueChange}>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger className="w-45">
         <SelectValue placeholder="Sort by..." />
       </SelectTrigger>
       <SelectContent>

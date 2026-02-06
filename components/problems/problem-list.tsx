@@ -5,7 +5,7 @@ import { ProblemCard } from "./problem-card";
 import { ProblemSortSelect, SortOption } from "./problem-sort-select";
 import { AddProblemDialog } from "./add-problem-dialog";
 import { Button } from "@/components/ui/button";
-import { Settings } from "lucide-react";
+import { Settings, Bug } from "lucide-react";
 import Link from "next/link";
 
 interface Problem {
@@ -32,6 +32,7 @@ export function ProblemList({
   trackedCount,
   untrackedCount,
 }: ProblemListProps) {
+  const [showBugReport, setShowBugReport] = useState(false);
   const [sortBy, setSortBy] = useState<SortOption>("nextReview");
 
   const trackedProblems = initialProblems.filter((p) => p.isTracking);
@@ -135,6 +136,44 @@ export function ProblemList({
             )}
           </>
         )}
+      </div>
+
+      {/* Floating Bug Report Button with Popover */}
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 text-right">
+        {showBugReport && (
+          <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-200 max-w-[250px]">
+            <p className="text-sm font-semibold text-gray-900 mb-1">
+              Found a bug?
+            </p>
+            <p className="text-xs text-gray-500 mb-2">
+              Send us an email with details:
+            </p>
+            <a
+              href="mailto:vishnudatta2004@gmail.com?subject=CodeRep%20Bug%20Report"
+              className="text-sm font-medium text-blue-600 hover:text-blue-700 block transition-colors"
+            >
+              vishnudatta2004@gmail.com
+            </a>
+          </div>
+        )}
+
+        <Button
+          onClick={() => setShowBugReport(!showBugReport)}
+          size="icon"
+          variant="outline"
+          className={`h-12 w-12 rounded-full shadow-lg border-gray-200 transition-all duration-200 ${
+            showBugReport
+              ? "bg-red-50 text-red-600 border-red-300 rotate-90"
+              : "bg-white hover:bg-gray-50"
+          }`}
+          title={showBugReport ? "Close" : "Report a bug"}
+        >
+          {showBugReport ? (
+            <span className="text-xl font-bold leading-none">×</span>
+          ) : (
+            <Bug className="h-6 w-6" />
+          )}
+        </Button>
       </div>
     </div>
   );

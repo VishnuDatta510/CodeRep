@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, Trash2 } from "lucide-react";
 
 interface ProblemProps {
   problem: {
@@ -34,6 +34,7 @@ export function ProblemCard({ problem }: ProblemProps) {
   const [notesOpen, setNotesOpen] = useState(false);
   const [notesText, setNotesText] = useState(problem.notes || "");
   const [notesSaving, setNotesSaving] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [countdown, setCountdown] = useState("");
 
   const handleReview = async (rating: string) => {
@@ -134,7 +135,26 @@ export function ProblemCard({ problem }: ProblemProps) {
     }
   };
 
-  // Calculate if problem is due today or overdue
+  /** Permanently deletes the problem */
+  const handleDelete = async () => {
+    if (!confirm("Delete this problem permanently? This cannot be undone."))
+      return;
+
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/problems/${problem.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) throw new Error("Failed to delete");
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete problem");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const reviewDate = new Date(problem.nextReviewDate);
@@ -142,9 +162,7 @@ export function ProblemCard({ problem }: ProblemProps) {
   const isDueToday = today.getTime() === reviewDate.getTime();
   const isOverdue = reviewDate.getTime() < today.getTime();
 
-  // Update countdown every minute
   useEffect(() => {
-    // Calculate countdown with live timer
     const calculateCountdown = () => {
       const now = new Date();
       const reviewDateFull = new Date(problem.nextReviewDate);
@@ -350,6 +368,16 @@ export function ProblemCard({ problem }: ProblemProps) {
                   : problem.isTracking
                     ? "Stop Tracking"
                     : "Track Again"}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleDelete}
+                disabled={deleteLoading}
+                className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                title="Delete problem"
+              >
+                <Trash2 className="w-4 h-4" />
               </Button>
             </>
           )}

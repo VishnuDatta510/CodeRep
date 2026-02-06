@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
-// Helper to get userId from Clerk session or API token
+/** Gets userId from Clerk session or API token */
 async function getUserId(req: Request): Promise<string | null> {
   const { userId } = await auth();
   if (userId) return userId;
@@ -30,21 +30,18 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Get today's date at start of day
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Get tomorrow at start of day
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    // Find problems due today or overdue
     const problems = await db.problem.findMany({
       where: {
         userId,
         isTracking: true,
         nextReviewDate: {
-          lt: tomorrow, // Due before tomorrow = due today or overdue
+          lt: tomorrow,
         },
       },
       orderBy: {

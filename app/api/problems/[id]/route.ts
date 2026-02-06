@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
-// Helper to get userId from Clerk session or API token
+/** Gets userId from Clerk session or API token */
 async function getUserId(req: Request): Promise<string | null> {
   const { userId } = await auth();
   if (userId) return userId;
@@ -47,7 +47,6 @@ export async function PATCH(
       return NextResponse.json({ error: "Problem not found" }, { status: 404 });
     }
 
-    // Handle notes update
     if (updateNotes !== undefined) {
       const updatedProblem = await db.problem.update({
         where: { id: id },
@@ -58,7 +57,6 @@ export async function PATCH(
       return NextResponse.json(updatedProblem);
     }
 
-    // Handle tracking toggle
     if (toggleTracking !== undefined) {
       const updatedProblem = await db.problem.update({
         where: { id: id },
@@ -69,7 +67,6 @@ export async function PATCH(
       return NextResponse.json(updatedProblem);
     }
 
-    // Handle progress reset (for mastered problems)
     if (resetProgress) {
       const updatedProblem = await db.problem.update({
         where: { id: id },
@@ -82,8 +79,7 @@ export async function PATCH(
       return NextResponse.json(updatedProblem);
     }
 
-    // Handle review rating
-    const MAX_INTERVAL = 60; // Safety cap: max 60 days between reviews
+    const MAX_INTERVAL = 60;
     let newInterval = problem.interval;
 
     if (rating === "Reset") {
@@ -96,7 +92,6 @@ export async function PATCH(
       newInterval = Math.ceil(problem.interval * 4.0);
     }
 
-    // Apply safety cap to prevent intervals from getting too long
     newInterval = Math.min(newInterval, MAX_INTERVAL);
 
     const newDate = new Date();
@@ -114,6 +109,40 @@ export async function PATCH(
     return NextResponse.json(updatedProblem);
   } catch (error) {
     console.error("Error updating problem:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}
+
+/** Deletes a problem permanently */
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
+) {
+  try {
+    const userId = await getUserId(req);
+    if (!userId)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id } = await params;
+
+    const problem = await db.problem.findUnique({
+      where: { id, userId },
+    });
+
+    if (!problem) {
+      return NextResponse.json({ error: "Problem not found" }, { status: 404 });
+    }
+
+    await db.problem.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting problem:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 },

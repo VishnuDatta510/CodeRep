@@ -11,19 +11,15 @@ export async function POST(_req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Generate a secure random token
     const token = crypto.randomBytes(32).toString("hex");
 
-    // Set expiration to 90 days from now
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 90);
 
-    // Delete existing tokens for this user (optional: allow multiple tokens)
     await db.apiToken.deleteMany({
       where: { userId },
     });
 
-    // Create new token
     await db.apiToken.create({
       data: {
         userId,
@@ -63,7 +59,6 @@ export async function GET(_req: Request) {
       return NextResponse.json({ token: null });
     }
 
-    // Check if expired
     if (apiToken.expiresAt < new Date()) {
       return NextResponse.json({ token: null, expired: true });
     }

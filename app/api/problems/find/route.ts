@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
 
-// Helper to get userId from Clerk session or API token
+/** Gets userId from Clerk session or API token */
 async function getUserId(req: Request): Promise<string | null> {
   const { userId } = await auth();
   if (userId) return userId;
@@ -40,7 +40,6 @@ export async function GET(req: Request) {
       );
     }
 
-    // Clean URL - extract problem slug
     const cleanUrl = url.split("?")[0].replace(/\/$/, "");
     const problemSlug = cleanUrl.split("/problems/")[1]?.split("/")[0];
 
