@@ -32,7 +32,7 @@ export function Footer() {
             Settings
           </Link>
           <a
-            href="https://github.com"
+            href="https://github.com/VishnuDatta510/CodeRep"
             target="_blank"
             rel="noopener noreferrer"
             className="transition-colors hover:text-foreground"

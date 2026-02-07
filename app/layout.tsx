@@ -18,7 +18,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      appearance={{
+        elements: {
+          footerAction__signIn: "hidden",
+          footerAction__signUp: "hidden",
+          formButtonPrimary: "bg-blue-600 hover:bg-blue-700",
+          card: "shadow-lg",
+          // Hide development mode badge
+          footer: "hidden",
+        },
+      }}
+    >
       <html lang="en">
         <body className={inter.className}>{children}</body>
       </html>

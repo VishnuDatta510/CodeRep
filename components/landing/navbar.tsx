@@ -3,8 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { SignInButton, SignedIn, SignedOut, useClerk } from "@clerk/nextjs";
-import { Settings, Chrome, User, LayoutDashboard } from "lucide-react";
+import {
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  SignOutButton,
+  useClerk,
+} from "@clerk/nextjs";
+import { Settings, Chrome, LogOut, LayoutDashboard, User } from "lucide-react";
 
 export function Navbar() {
   const { openUserProfile } = useClerk();
@@ -66,6 +72,12 @@ export function Navbar() {
               <User className="size-4" />
               Account
             </Button>
+            <SignOutButton redirectUrl="/">
+              <Button variant="outline" size="default" className="gap-2">
+                <LogOut className="size-4" />
+                Sign Out
+              </Button>
+            </SignOutButton>
           </SignedIn>
         </div>
       </div>

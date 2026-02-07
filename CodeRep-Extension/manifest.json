@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "CodeRep - Spaced Repetition for Coding",
+  "name": "CodeRep - Spaced Repetition for LeetCode",
   "version": "1.0.0",
   "description": "Add LeetCode problems to your CodeRep revision list with one click. Track your progress with spaced repetition.",
   "permissions": ["activeTab", "storage"],

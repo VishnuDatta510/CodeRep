@@ -85,7 +85,7 @@ export default function PrivacyPolicy() {
           </p>
           <p className="text-gray-700">
             <strong>Server Storage</strong>: Problem data and review history are
-            stored securely on our servers (hosted on Vercel and Neon) with
+            stored securely on our servers (hosted on Vercel and Supabase) with
             encryption at rest and in transit via HTTPS/TLS.
           </p>
         </section>
@@ -135,9 +135,9 @@ export default function PrivacyPolicy() {
               )
             </li>
             <li>
-              <strong>Neon</strong>: Database hosting (
+              <strong>Supabase</strong>: Database hosting (
               <a
-                href="https://neon.tech/privacy-policy"
+                href="https://supabase.com/privacy"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline"
