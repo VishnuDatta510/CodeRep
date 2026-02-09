@@ -789,7 +789,6 @@ body {
 }
 
 .action-btn.danger:hover {
-  background: var(--error);
   color: white;
   border-color: var(--error);
 }
