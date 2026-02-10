@@ -4,9 +4,7 @@ import { db } from "@/lib/db";
 
 /** Gets userId from Clerk session or API token */
 async function getUserId(req: Request): Promise<string | null> {
-  const { userId } = await auth();
-  if (userId) return userId;
-
+  // Check Bearer token FIRST for faster extension authentication
   const authHeader = req.headers.get("Authorization");
   if (authHeader?.startsWith("Bearer ")) {
     const token = authHeader.substring(7);
@@ -18,6 +16,10 @@ async function getUserId(req: Request): Promise<string | null> {
       return apiToken.userId;
     }
   }
+
+  // Fall back to Clerk session auth for web requests
+  const { userId } = await auth();
+  if (userId) return userId;
 
   return null;
 }

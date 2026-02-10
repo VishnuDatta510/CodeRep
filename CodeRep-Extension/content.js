@@ -11,6 +11,27 @@
   let ratedProblems = new Set();
   let currentSubmissionUrl = null;
 
+  /** Fetch with timeout to handle slow responses */
+  async function fetchWithTimeout(url, options = {}, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === "AbortError") {
+        throw new Error("Request timeout - please try again");
+      }
+      throw error;
+    }
+  }
+
   /** Extracts problem title, URL, and difficulty from the LeetCode page */
   function extractProblemDetails() {
     const url = window.location.href.split("?")[0];
@@ -151,14 +172,18 @@
     }
 
     try {
-      const response = await fetch(`${baseUrl}/api/problems`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetchWithTimeout(
+        `${baseUrl}/api/problems`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(problemData),
         },
-        body: JSON.stringify(problemData),
-      });
+        10000,
+      );
 
       if (!response.ok) {
         const error = await response.json();
@@ -179,11 +204,12 @@
     if (!token) return false;
 
     try {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `${baseUrl}/api/problems/check?url=${encodeURIComponent(url)}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
+        10000,
       );
 
       if (response.ok) {
@@ -208,11 +234,12 @@
     console.log("[CodeRep] Finding problem by URL:", url);
 
     try {
-      const response = await fetch(
+      const response = await fetchWithTimeout(
         `${baseUrl}/api/problems/find?url=${encodeURIComponent(url)}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
+        10000,
       );
 
       if (response.ok) {
@@ -239,14 +266,18 @@
     if (!token) return false;
 
     try {
-      const response = await fetch(`${baseUrl}/api/problems/${problemId}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+      const response = await fetchWithTimeout(
+        `${baseUrl}/api/problems/${problemId}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ rating }),
         },
-        body: JSON.stringify({ rating }),
-      });
+        10000,
+      );
 
       return response.ok;
     } catch (error) {

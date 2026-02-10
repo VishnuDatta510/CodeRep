@@ -24,6 +24,27 @@ document.addEventListener("DOMContentLoaded", async () => {
     baseUrl: "https://coderep.vercel.app",
   };
 
+  /** Fetch with timeout to handle slow responses */
+  async function fetchWithTimeout(url, options = {}, timeout = 10000) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error.name === "AbortError") {
+        throw new Error("Request timeout - please try again");
+      }
+      throw error;
+    }
+  }
+
   async function init() {
     const data = await chrome.storage.sync.get(["apiToken", "apiUrl"]);
     config.token = data.apiToken || null;
@@ -78,14 +99,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     showState("loading");
 
     try {
-      const response = await fetch(`${config.baseUrl}/api/problems/today`, {
-        headers: {
-          Authorization: `Bearer ${config.token}`,
+      const response = await fetchWithTimeout(
+        `${config.baseUrl}/api/problems/today`,
+        {
+          headers: {
+            Authorization: `Bearer ${config.token}`,
+          },
         },
-      });
+        10000, // 10 second timeout
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch");
+        const errorText = await response.text();
+        console.error(`API Error ${response.status}:`, errorText);
+
+        if (response.status === 401) {
+          console.error("Token is invalid or expired. Please reconnect.");
+        }
+
+        throw new Error(`HTTP ${response.status}`);
       }
 
       const problems = await response.json();
@@ -100,6 +132,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch (error) {
       console.error("Error loading problems:", error);
+      console.error("Config:", {
+        baseUrl: config.baseUrl,
+        hasToken: !!config.token,
+      });
       elements.headerStatus.classList.remove("connected");
       elements.headerStatus.classList.add("disconnected");
       showState("error");
@@ -175,11 +211,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
 
     try {
-      const response = await fetch(`${config.baseUrl}/api/problems/today`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      // Validate token with timeout and retry
+      const response = await fetchWithTimeout(
+        `${config.baseUrl}/api/problems/today`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+        10000, // 10 second timeout
+      );
 
       if (!response.ok) {
         throw new Error("Invalid token");
@@ -191,6 +232,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       showLoggedIn();
       await loadTodayProblems();
     } catch (error) {
+      console.error("Token validation error:", error);
       elements.apiTokenInput.classList.add("error");
       elements.saveTokenBtn.innerHTML = `<span>Invalid Token - Try Again</span>`;
 
