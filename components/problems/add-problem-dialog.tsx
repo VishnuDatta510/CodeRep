@@ -145,13 +145,13 @@ export function AddProblemDialog() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "Easy":
-        return "text-green-500";
+        return "text-green-500 dark:text-green-400";
       case "Medium":
-        return "text-yellow-500";
+        return "text-yellow-500 dark:text-yellow-400";
       case "Hard":
-        return "text-red-500";
+        return "text-red-500 dark:text-red-400";
       default:
-        return "text-gray-500";
+        return "text-muted-foreground";
     }
   };
 
@@ -178,12 +178,14 @@ export function AddProblemDialog() {
               required
             />
             {fetching && (
-              <p className="text-sm text-blue-600 font-medium">
+              <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
                 Fetching problem details...
               </p>
             )}
             {fetchError && (
-              <p className="text-sm text-red-600 font-semibold">{fetchError}</p>
+              <p className="text-sm text-red-600 dark:text-red-400 font-semibold">
+                {fetchError}
+              </p>
             )}
           </div>
 

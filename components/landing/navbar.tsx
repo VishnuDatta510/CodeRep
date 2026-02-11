@@ -11,6 +11,7 @@ import {
   useClerk,
 } from "@clerk/nextjs";
 import { Settings, Chrome, LogOut, LayoutDashboard, User } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function Navbar() {
   const { openUserProfile } = useClerk();
@@ -45,7 +46,11 @@ export function Navbar() {
                 Settings
               </Button>
             </Link>
-            <Link href="/dashboard">
+            <Link
+              href="https://chromewebstore.google.com/detail/coderep-spaced-repetition/aegfcnjkdcloiehaimenldcgfmaoibda"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button variant="ghost" size="default" className="gap-2">
                 <Chrome className="size-4" />
                 Extension
@@ -55,7 +60,9 @@ export function Navbar() {
         </nav>
 
         {/* Auth */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+
           <SignedOut>
             <SignInButton mode="modal">
               <Button size="default">Sign In</Button>

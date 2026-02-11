@@ -2,6 +2,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import type { Metadata } from "next";
 
@@ -26,14 +27,19 @@ export default function RootLayout({
           footerAction__signUp: "hidden",
           formButtonPrimary: "bg-blue-600 hover:bg-blue-700",
           card: "shadow-lg",
-          // Hide development mode badge
           footer: "hidden",
         },
       }}
     >
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={inter.className}>
-          {children}
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            disableTransitionOnChange={false}
+          >
+            {children}
+          </ThemeProvider>
           <Analytics />
         </body>
       </html>

@@ -196,10 +196,10 @@ export function ProblemCard({ problem }: ProblemProps) {
     <div
       className={`p-4 border rounded-lg flex justify-between items-center transition-all hover:shadow-md ${
         isOverdue
-          ? "bg-red-50 border-red-300 shadow-sm"
+          ? "bg-red-50 border-red-300 dark:bg-black/30 dark:border-l-4 dark:border-l-red-500 dark:border-border shadow-sm"
           : isDueToday
-            ? "bg-blue-50 border-blue-200 shadow-sm"
-            : "bg-card border-gray-200 shadow-sm"
+            ? "bg-blue-50 border-blue-200 dark:bg-black/30 dark:border-l-4 dark:border-l-blue-500 dark:border-border shadow-sm"
+            : "bg-card border-border shadow-sm"
       }`}
     >
       <div>
@@ -208,36 +208,36 @@ export function ProblemCard({ problem }: ProblemProps) {
             href={problem.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors flex items-center gap-1.5 group"
+            className="text-lg font-semibold text-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors flex items-center gap-1.5 group"
           >
             {problem.title}
-            <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition-colors" />
+            <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
           </a>
         </div>
-        <div className="flex gap-2 text-sm text-gray-600 mt-1">
+        <div className="flex gap-2 text-sm text-muted-foreground mt-1">
           <span
             className={`px-2 py-0.5 rounded text-xs font-medium ${
               problem.difficulty === "Easy"
-                ? "bg-green-100 text-green-700"
+                ? "bg-green-100 dark:bg-green-950/40 text-green-700 dark:text-green-400"
                 : problem.difficulty === "Medium"
-                  ? "bg-yellow-100 text-yellow-700"
-                  : "bg-red-100 text-red-700"
+                  ? "bg-yellow-100 dark:bg-yellow-950/40 text-yellow-700 dark:text-yellow-400"
+                  : "bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-400"
             }`}
           >
             {problem.difficulty}
           </span>
           {problem.interval >= 60 && (
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-purple-100 text-purple-700 border border-purple-200">
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-400 border border-gray-200 dark:border-gray-700">
               MASTERED
             </span>
           )}
           {isOverdue && (
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-red-100 text-red-700 border border-red-200 animate-pulse">
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-red-100 dark:bg-red-950/40 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 animate-pulse">
               Overdue
             </span>
           )}
           {isDueToday && (
-            <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200 animate-pulse">
+            <span className="px-2 py-0.5 rounded text-xs font-bold bg-blue-100 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 animate-pulse">
               Due Today
             </span>
           )}
@@ -246,7 +246,7 @@ export function ProblemCard({ problem }: ProblemProps) {
             <button
               onClick={handleResetProgress}
               disabled={loading}
-              className="ml-2 px-2 py-0.5 rounded text-xs font-medium bg-orange-50 text-orange-700 border border-orange-200 hover:bg-orange-100 transition-colors disabled:opacity-50"
+              className="ml-2 px-2 py-0.5 rounded text-xs font-medium bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-400 border border-orange-200 dark:border-orange-800 hover:bg-orange-100 dark:hover:bg-orange-950/60 transition-colors disabled:opacity-50"
             >
               Reset Progress
             </button>
@@ -256,10 +256,10 @@ export function ProblemCard({ problem }: ProblemProps) {
 
       <div className="flex flex-col items-end gap-2">
         <div className="text-right">
-          <p className="text-xs font-bold text-gray-400 uppercase">
+          <p className="text-xs font-bold text-muted-foreground uppercase">
             Next Review
           </p>
-          <p className="text-sm font-medium">
+          <p className="text-sm font-medium text-foreground">
             {new Date(problem.nextReviewDate).toLocaleDateString("en-US", {
               month: "2-digit",
               day: "2-digit",
@@ -291,7 +291,7 @@ export function ProblemCard({ problem }: ProblemProps) {
               <Button
                 size="sm"
                 variant="outline"
-                className="text-yellow-600 border-yellow-200"
+                className="text-yellow-600 dark:text-yellow-400 border-yellow-200 dark:border-yellow-800 hover:bg-yellow-50 dark:hover:bg-yellow-950/30"
                 onClick={() => handleReview("Hard")}
                 disabled={loading}
               >
@@ -300,7 +300,7 @@ export function ProblemCard({ problem }: ProblemProps) {
               <Button
                 size="sm"
                 variant="outline"
-                className="text-green-600 border-green-200"
+                className="text-green-600 dark:text-green-400 border-green-200 dark:border-green-800 hover:bg-green-50 dark:hover:bg-green-950/30"
                 onClick={() => handleReview("Good")}
                 disabled={loading}
               >
@@ -360,7 +360,7 @@ export function ProblemCard({ problem }: ProblemProps) {
                 className={
                   problem.isTracking
                     ? ""
-                    : "bg-green-50 text-green-700 hover:bg-green-100"
+                    : "bg-green-50 dark:bg-green-950/40 text-green-700 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-950/60 border-green-200 dark:border-green-800"
                 }
               >
                 {trackLoading
@@ -374,7 +374,7 @@ export function ProblemCard({ problem }: ProblemProps) {
                 variant="ghost"
                 onClick={handleDelete}
                 disabled={deleteLoading}
-                className="h-8 w-8 p-0 text-gray-400 hover:text-red-600 hover:bg-red-50"
+                className="h-8 w-8 p-0 text-muted-foreground hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
                 title="Delete problem"
               >
                 <Trash2 className="w-4 h-4" />

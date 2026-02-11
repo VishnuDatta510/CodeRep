@@ -74,83 +74,87 @@ export function ProblemList({
   const sortedTrackedProblems = sortProblems(trackedProblems);
 
   return (
-    <div className="p-10 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">My Problems</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            {trackedCount} tracked • {untrackedCount} archived
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <ProblemSortSelect value={sortBy} onValueChange={setSortBy} />
-          <AddProblemDialog />
-          <Link href="/dashboard/settings">
-            <Button variant="outline" size="icon" className="shrink-0">
-              <Settings className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
-      </div>
-
-      <div className="grid gap-4">
-        {initialProblems.length === 0 ? (
-          <div className="border border-dashed border-gray-300 p-20 rounded-lg text-center">
-            <h2 className="text-xl font-semibold text-gray-600">
-              No problems yet!
-            </h2>
-            <p className="text-gray-400">
-              Add your first problem to start your spaced repetition.
+    <div className="min-h-screen bg-background dark:bg-zinc-950 p-10">
+      <div className="max-w-5xl mx-auto">
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground dark:text-zinc-100">
+              My Problems
+            </h1>
+            <p className="text-sm text-muted-foreground dark:text-zinc-400 mt-1">
+              {trackedCount} tracked • {untrackedCount} archived
             </p>
           </div>
-        ) : (
-          <>
-            {/* Tracked Problems */}
-            {sortedTrackedProblems.length > 0 && (
-              <div className="space-y-4">
-                {sortedTrackedProblems.map((problem) => (
-                  <ProblemCard key={problem.id} problem={problem} />
-                ))}
-              </div>
-            )}
+          <div className="flex items-center gap-3">
+            <ProblemSortSelect value={sortBy} onValueChange={setSortBy} />
+            <AddProblemDialog />
+            <Link href="/dashboard/settings">
+              <Button variant="outline" size="icon" className="shrink-0">
+                <Settings className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
 
-            {/* Untracked/Archived Problems */}
-            {untrackedProblems.length > 0 && (
-              <details className="mt-8 group">
-                <summary className="cursor-pointer p-4 border rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors list-none">
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-muted-foreground">
-                      Archived Problems - {untrackedProblems.length}
-                    </span>
-                    <span className="text-xs text-muted-foreground group-open:rotate-180 transition-transform">
-                      ▼
-                    </span>
-                  </div>
-                  <div className="mt-4 space-y-4 opacity-60 group-open:block hidden">
-                    {untrackedProblems.map((problem) => (
-                      <ProblemCard key={problem.id} problem={problem} />
-                    ))}
-                  </div>
-                </summary>
-              </details>
-            )}
-          </>
-        )}
+        <div className="grid gap-3">
+          {initialProblems.length === 0 ? (
+            <div className="border border-dashed border-border p-20 rounded-xl text-center bg-muted/50">
+              <h2 className="text-xl font-semibold text-foreground">
+                No problems yet!
+              </h2>
+              <p className="text-muted-foreground">
+                Add your first problem to start your spaced repetition.
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Tracked Problems */}
+              {sortedTrackedProblems.length > 0 && (
+                <div className="space-y-3">
+                  {sortedTrackedProblems.map((problem) => (
+                    <ProblemCard key={problem.id} problem={problem} />
+                  ))}
+                </div>
+              )}
+
+              {/* Untracked/Archived Problems */}
+              {untrackedProblems.length > 0 && (
+                <details className="mt-8 group">
+                  <summary className="cursor-pointer p-4 border rounded-xl bg-muted/30 border-border hover:bg-muted/50 transition-colors list-none">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-muted-foreground">
+                        Archived Problems - {untrackedProblems.length}
+                      </span>
+                      <span className="text-xs text-muted-foreground group-open:rotate-180 transition-transform">
+                        ▼
+                      </span>
+                    </div>
+                    <div className="mt-4 space-y-3 opacity-60 group-open:block hidden">
+                      {untrackedProblems.map((problem) => (
+                        <ProblemCard key={problem.id} problem={problem} />
+                      ))}
+                    </div>
+                  </summary>
+                </details>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Floating Bug Report Button with Popover */}
       <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2 text-right">
         {showBugReport && (
-          <div className="bg-white p-4 rounded-lg shadow-xl border border-gray-200 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-200 max-w-[250px]">
-            <p className="text-sm font-semibold text-gray-900 mb-1">
+          <div className="bg-card dark:bg-zinc-900 p-4 rounded-lg shadow-xl border border-border dark:border-zinc-800 mb-2 animate-in fade-in slide-in-from-bottom-4 duration-200 max-w-[250px]">
+            <p className="text-sm font-semibold text-foreground dark:text-zinc-100 mb-1">
               Found a bug?
             </p>
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-muted-foreground dark:text-zinc-400 mb-2">
               Send us an email with details:
             </p>
             <a
               href="mailto:vishnudatta2004@gmail.com?subject=CodeRep%20Bug%20Report"
-              className="text-sm font-medium text-blue-600 hover:text-blue-700 block transition-colors"
+              className="text-sm font-medium text-blue-600 dark:text-indigo-400 hover:text-blue-700 dark:hover:text-indigo-300 block transition-colors"
             >
               vishnudatta2004@gmail.com
             </a>
@@ -161,10 +165,10 @@ export function ProblemList({
           onClick={() => setShowBugReport(!showBugReport)}
           size="icon"
           variant="outline"
-          className={`h-12 w-12 rounded-full shadow-lg border-gray-200 transition-all duration-200 ${
+          className={`h-12 w-12 rounded-full shadow-lg border-border transition-all duration-200 ${
             showBugReport
-              ? "bg-red-50 text-red-600 border-red-300 rotate-90"
-              : "bg-white hover:bg-gray-50"
+              ? "bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 border-red-300 dark:border-red-800 rotate-90"
+              : "bg-card hover:bg-accent"
           }`}
           title={showBugReport ? "Close" : "Report a bug"}
         >
