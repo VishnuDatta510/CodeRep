@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SignInButton, SignedIn, SignedOut } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -10,21 +11,16 @@ export function HeroSection() {
 
       <div className="relative mx-auto max-w-7xl px-8 py-32 md:py-40 lg:py-48">
         <div className="mx-auto max-w-4xl text-center">
-          {/* Badge */}
-          <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border bg-muted px-5 py-2 text-base text-muted-foreground">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-            </span>
-            Open source &amp; free forever
-          </div>
-
           {/* Headline */}
           <h1 className="text-5xl font-bold tracking-tight sm:text-6xl md:text-7xl lg:text-8xl">
             Never Forget a{" "}
             <span className="relative">
               <span className="relative z-10">LeetCode</span>
-              <span className="absolute bottom-2 left-0 z-0 h-4 w-full bg-primary/10 md:bottom-4 md:h-5" />
+              {/* LeetCode brand color underline: #FFA116 */}
+              <span
+                className="absolute bottom-2 left-0 z-0 h-4 w-full md:bottom-4 md:h-5 rounded-sm"
+                style={{ backgroundColor: "#FFA116", opacity: 0.35 }}
+              />
             </span>{" "}
             Problem Again
           </h1>
@@ -38,12 +34,22 @@ export function HeroSection() {
 
           {/* CTAs */}
           <div className="mt-12 flex flex-col items-center justify-center gap-5 sm:flex-row">
-            <Link href="/dashboard">
-              <Button size="lg" className="gap-2 px-10 py-6 text-lg">
-                Get Started
-                <ArrowRight className="size-4" />
-              </Button>
-            </Link>
+            <SignedIn>
+              <Link href="/dashboard">
+                <Button size="lg" className="gap-2 px-10 py-6 text-lg">
+                  Get Started
+                  <ArrowRight className="size-4" />
+                </Button>
+              </Link>
+            </SignedIn>
+            <SignedOut>
+              <SignInButton mode="modal">
+                <Button size="lg" className="gap-2 px-10 py-6 text-lg">
+                  Get Started
+                  <ArrowRight className="size-4" />
+                </Button>
+              </SignInButton>
+            </SignedOut>
             <a href="#how-it-works">
               <Button
                 variant="outline"

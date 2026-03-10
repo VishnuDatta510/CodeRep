@@ -65,6 +65,7 @@ export function ThemeToggle() {
         pseudoElement: isDark
           ? "::view-transition-new(root)"
           : "::view-transition-old(root)",
+        fill: "forwards",
       },
     );
   };

@@ -33,6 +33,16 @@ export function Navbar() {
 
         {/* Nav Links */}
         <nav className="hidden items-center gap-2 md:flex">
+          <Link
+            href="https://chromewebstore.google.com/detail/coderep-spaced-repetition/aegfcnjkdcloiehaimenldcgfmaoibda"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button variant="ghost" size="default" className="gap-2">
+              <Chrome className="size-4" />
+              Extension
+            </Button>
+          </Link>
           <SignedIn>
             <Link href="/dashboard">
               <Button variant="ghost" size="default" className="gap-2">
@@ -44,16 +54,6 @@ export function Navbar() {
               <Button variant="ghost" size="default" className="gap-2">
                 <Settings className="size-4" />
                 Settings
-              </Button>
-            </Link>
-            <Link
-              href="https://chromewebstore.google.com/detail/coderep-spaced-repetition/aegfcnjkdcloiehaimenldcgfmaoibda"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button variant="ghost" size="default" className="gap-2">
-                <Chrome className="size-4" />
-                Extension
               </Button>
             </Link>
           </SignedIn>
